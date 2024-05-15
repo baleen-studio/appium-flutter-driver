@@ -11,16 +11,16 @@ void main() {
   runApp(MyApp());
 }
 
-@widget
-Widget myApp() => MaterialApp(
+//@widget
+Widget myApp() => const MaterialApp(
   title: 'Counter App',
   home: MyHomePage(title: 'Counter App Home Page'),
 );
 
 
 
-@widget
-Widget myHomePage(BuildContext context, {String title}) => Scaffold(
+//@widget
+Widget myHomePage(BuildContext context, {required String title}) => Scaffold(
   appBar: AppBar(
     title: Text(title),
   ),
@@ -28,7 +28,7 @@ Widget myHomePage(BuildContext context, {String title}) => Scaffold(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(
+        const Text(
           'You have pushed the button this many times:',
         ),
         Tooltip(
@@ -38,29 +38,29 @@ Widget myHomePage(BuildContext context, {String title}) => Scaffold(
             builder: (context, snapshot) {
               return Text(
                 '${snapshot.data}',
-                key: Key('counter'),
-                style: Theme.of(context).textTheme.display1,
+                key: const Key('counter'),
+                style: Theme.of(context).textTheme.displayMedium,
                 semanticsLabel: 'counter_semantic',
               );
             }
           ),
         ),
-        FlatButton(
+        ElevatedButton(
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => Scaffold(
                         appBar: AppBar(
-                          title: Text("Second Route"),
+                          title: const Text("Second Route"),
                         ),
-                        body: Center(
+                        body: const Center(
                           child: SecondPage(),
                         ),
                       )),
             );
           },
-          child: Text(
+          child: const Text(
             'Go to next route',
             key: Key('next_route_key'),
           ),
@@ -71,14 +71,14 @@ Widget myHomePage(BuildContext context, {String title}) => Scaffold(
   floatingActionButton: FloatingActionButton(
     // Provide a Key to this button. This allows finding this
     // specific button inside the test suite, and tapping it.
-    key: Key('increment'),
+    key: const Key('increment'),
     onPressed: () => plusClickSink.add(null),
     tooltip: 'Increment',
-    child: Icon(Icons.add),
+    child: const Icon(Icons.add),
   ),
 );
 
-@widget
+//@widget
 Widget secondPage() => ListView(
   padding: const EdgeInsets.all(8.0),
   children: <Widget>[

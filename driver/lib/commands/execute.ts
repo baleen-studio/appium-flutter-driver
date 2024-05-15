@@ -6,7 +6,6 @@ import { waitFor, waitForAbsent, waitForTappable } from './execute/wait';
 import { launchApp } from './../ios/app';
 import B from 'bluebird';
 
-
 const flutterCommandRegex = /^[\s]*flutter[\s]*:(.+)/;
 
 export const execute = async function(
@@ -60,6 +59,8 @@ export const execute = async function(
       return await waitFor(this, args[0], args[1]);
     case `waitForTappable`:
       return await waitForTappable(this, args[0], args[1]);
+    case `screenshot`:
+      return await screenshot(this);
     case `scroll`:
       return await scroll(this, args[0], args[1]);
     case `scrollUntilVisible`:
@@ -77,7 +78,7 @@ export const execute = async function(
     case `longTap`:
       return await longTap(this, args[0], args[1]);
     case `waitForFirstFrame`:
-      return await waitForCondition(this, { conditionName: `FirstFrameRasterizedCondition`});
+      return await waitForCondition(this, { conditionName: `FirstFrameRasterizedCondition` });
     case `setFrameSync`:
       return await setFrameSync(this, args[0], args[1]);
     case `clickElement`:
@@ -113,6 +114,8 @@ const getOffset = async (
   elementBase64: string,
   offsetType: {offsetType: string},
 ) => await self.executeElementCommand(`get_offset`, elementBase64, offsetType);
+
+const screenshot = async (self: FlutterDriver) => await self.executeElementCommand(`screenshot`, '', '');
 
 const waitForCondition = async (
   self: FlutterDriver,
@@ -192,6 +195,6 @@ const setTextEntryEmulation = async (self: FlutterDriver, enabled: boolean) =>
 const clickElement = async (self:FlutterDriver, elementBase64: string, opts) => {
   const {timeout = 1000} = opts;
   return await self.executeElementCommand(`tap`, elementBase64, {
-        timeout
+    timeout
   });
 };

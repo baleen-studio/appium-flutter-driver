@@ -11,10 +11,10 @@ from appium_flutter_finder.flutter_finder import FlutterElement, FlutterFinder
 
 options = XCUITestOptions()
 options.automation_name = 'flutter'
-options.platform_name = 'ios'
-options.set_capability('platformVersion', '17.0')
-options.set_capability('deviceName', 'iPhone 15')
-options.set_capability('app', f'{os.path.dirname(os.path.realpath(__file__))}/../sample2/IOSFullScreen.zip')
+options.platform_name = 'android'
+options.set_capability('platformVersion', '14.0')
+options.set_capability('deviceName', 'emulator-5554')
+options.set_capability('app', f'{os.path.dirname(os.path.realpath(__file__))}/../../apps/android-real-debug.apk')
 
 driver = Remote('http://localhost:4723', options=options)
 

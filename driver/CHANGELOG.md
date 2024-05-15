@@ -1,12 +1,5 @@
 # Changelog
 
-## 2.6.0
-- Update Appium XCUITest driver dependency to 7.11.1
-- `doctor` command can skip Android or iOS with environment variables
-
-## 2.5.1
-- fix: scroll until visible + scroll until tapable [#671](https://github.com/appium/appium-flutter-driver/pull/671)
-
 ## 2.5.0
 - Update Appium XCUITest driver dependency to 6.0.1
 

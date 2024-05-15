@@ -14,7 +14,7 @@ import {
 import { clear, getText, setValue } from './commands/element';
 import { execute } from './commands/execute';
 import { click, longTap, performTouch, tap, tapEl } from './commands/gesture';
-import { getScreenshot } from './commands/screen';
+import { getScreenshot, getWindowRect, getPageSource, performActions } from './commands/screen';
 import { getClipboard, setClipboard } from './commands/clipboard';
 import { desiredCapConstraints } from './desired-caps';
 import XCUITestDriver from 'appium-xcuitest-driver';
@@ -25,7 +25,6 @@ import type {
 } from '@appium/types';
 import type { IsolateSocket } from './sessions/isolate_socket';
 import type { Server } from 'node:net';
-
 
 type FluttertDriverConstraints = typeof desiredCapConstraints;
 // Need to not proxy in WebView context
@@ -72,6 +71,9 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
   public setValue = setValue;
   public clear = clear;
   public getScreenshot = getScreenshot;
+  public getWindowRect = getWindowRect;
+  public getPageSource = getPageSource;
+  public performActions = performActions;
 
   // gesture
   public click = click;
@@ -81,7 +83,6 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
   public performTouch = performTouch;
 
   // context
-
   public getContexts = getContexts;
   public getCurrentContext = getCurrentContext;
   public setContext = setContext;
@@ -185,6 +186,28 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
     return result;
   }
 
+  public objDump(obj: any, rIndent: string): string {
+    if (!obj) return '';
+  
+    var result = '', indent = '\t', br = '\n';
+  
+    if (rIndent) indent += rIndent;
+  
+    if (typeof obj === 'object' && !obj.tagName) {
+      result += '[ Object ] ->' + br;
+  
+      for (var key in obj) {
+        result += indent + key + ' = ';
+        result += typeof obj[key] === 'object' ? this.objDump(obj[key], indent) : obj[key];
+        result += br;
+      }
+    } else {
+      result = obj;
+    }
+  
+    return String(result);
+  };
+
   public async executeCommand(cmd: string, ...args: [string, [{skipAttachObservatoryUrl: string, any: any}]]) {
     if (new RegExp(/^[\s]*mobile:[\s]*activateApp$/).test(args[0])) {
       const { skipAttachObservatoryUrl = false } = args[1][0];
@@ -198,6 +221,22 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
     } else if (cmd === `receiveAsyncResponse`) {
       logger.debug(`Executing FlutterDriver response '${cmd}'`);
       return await this.receiveAsyncResponse(...args);
+    } else if (cmd === `findElement`) {
+      logger.debug(`Executing Flutter driver command '${cmd}' '${args}'`);
+      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
+      var mess = JSON.parse(response.response.message);
+      return mess.value;
+    } else if (cmd === `click`) {
+      /*
+      const data = await this.socket!.executeSocketCommand({ command: `get_layer_tree` });
+      if (!data.isError) {
+        logger.debug(this.objDump(data.response,'\t'));
+      }
+      */
+      logger.debug(`Executing Flutter normal driver command '${cmd}' '${args}'`);
+      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
+      var mess = JSON.parse(response.response.message);
+      return mess;
     } else {
       if (this.driverShouldDoProxyCmd(cmd)) {
         logger.debug(`Executing proxied driver command '${cmd}'`);
@@ -211,8 +250,9 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
         this.startNewCommandTimeout();
         return result;
       } else {
-        logger.debug(`Executing Flutter driver command '${cmd}'`);
+        logger.debug(`Executing Flutter super driver command '${cmd}' '${args}'`);
         return await super.executeCommand(cmd, ...args);
+        //return await this.execute(`flutter:${cmd}`, args);
       }
     }
   }

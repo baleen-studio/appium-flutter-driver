@@ -5,7 +5,7 @@
     "appium",
     "flutter"
   ],
-  "version": "2.6.0",
+  "version": "2.5.0",
   "author": "TruongSinh Tran-Nguyen <i@truongsinh.pro>",
   "license": "MIT",
   "repository": {
@@ -28,7 +28,10 @@
     "mainClass": "FlutterDriver",
     "doctor": {
       "checks": [
-        "./build/lib/doctor/checks.js"
+        "./node_modules/appium-uiautomator2-driver/build/lib/doctor/required-checks.js",
+        "./node_modules/appium-uiautomator2-driver/build/lib/doctor/optional-checks.js",
+        "./node_modules/appium-xcuitest-driver/build/lib/doctor/required-checks.js",
+        "./node_modules/appium-xcuitest-driver/build/lib/doctor/optional-checks.js"
       ]
     }
   },
@@ -70,13 +73,13 @@
     "eslint-plugin-promise": "^6.1.1",
     "semantic-release": "^23.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "~5.4"
+    "typescript": "~5.3"
   },
   "dependencies": {
     "appium-ios-device": "^2.4.1",
-    "appium-android-driver": "^9.0.3",
+    "appium-android-driver": "^9.6.0",
     "appium-uiautomator2-driver": "^3.0.0",
-    "appium-xcuitest-driver": "^7.11.1",
+    "appium-xcuitest-driver": "^6.0.1",
     "bluebird": "^3.1.1",
     "lodash": "^4.0.0",
     "portscanner": "^2.2.0",

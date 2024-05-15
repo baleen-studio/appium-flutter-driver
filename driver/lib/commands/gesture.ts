@@ -14,6 +14,7 @@ export const tapEl = async function(
   // perform a tap on the given element
   // if longPress is true, the tap becomes a longPress action
   const commandName = longPress ? `longPress` : `tap`;
+  
   return await this.executeElementCommand(commandName, el);
 };
 

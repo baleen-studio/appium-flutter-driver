@@ -22,6 +22,7 @@ const OBSERVATORY_URL_PATTERN = new RegExp(
 );
 type AnyDriver = XCUITestDriver | AndroidUiautomator2Driver;
 
+export let globalDartObservatoryURL: string;
 // SOCKETS
 export const connectSocket = async (
   getObservatoryWsUri: (flutterDriver: FlutterDriver, driver: AnyDriver, caps: any) => Promise<string>,
@@ -223,6 +224,8 @@ export const fetchObservatoryUrl = (deviceLogs: [{ message: string }]): URL => {
   for (const line of deviceLogs.map((e) => e.message).reverse()) {
     const match = line.match(OBSERVATORY_URL_PATTERN);
     if (match) {
+      globalDartObservatoryURL = match[2];
+      log.debug(`>>> send to flutter code: ${globalDartObservatoryURL}`);
       dartObservatoryURL = new URL(match[2]);
       break;
     }

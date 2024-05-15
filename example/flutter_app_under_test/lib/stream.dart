@@ -1,12 +1,12 @@
 import 'dart:async' show StreamSink;
 
 import 'package:rxdart/rxdart.dart'
-    show BehaviorSubject;
+    show BehaviorSubject, WithLatestFromExtensions;
 
-final counterSubject = new BehaviorSubject<int>.seeded(0);
+final counterSubject = BehaviorSubject<int>.seeded(0);
 final counterStream = counterSubject.stream;
 
-final plusClickSubject = new BehaviorSubject<void>();
+final plusClickSubject = BehaviorSubject<void>();
 final StreamSink plusClickSink = plusClickSubject;
 
 void init() {
