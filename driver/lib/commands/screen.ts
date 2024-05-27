@@ -32,6 +32,38 @@ export const performActions = async function(this: FlutterDriver, actions: strin
   if (typeof actions != 'string') {
     actions = JSON.stringify(actions);
   }
-  const response = await this.execute(`flutter:requestData`, ['performActions:'+actions]) as any;
-  return response;
+
+  const json = JSON.parse(actions);
+  const performs = json[0];
+  const type = performs['type'];
+  const id = performs['id'];
+  const parameters = performs['parameters'];
+  const pointerType = parameters['pointerType'];
+  const commands = performs['actions'];
+
+  let x;
+  let y;
+  let duration = 0;
+  for (const command of commands) {
+    const type = command['type'];
+    switch (type) {
+      case 'pointerMove':
+        x = command['x'];
+        y = command['y'];
+        break;
+      case 'pointerDown':
+        break;
+      case 'pause':
+        duration = command['duration'];
+      case 'pointerUp':
+        const params = {
+          "command":"tap","finderType":"ByTooltipMessage","text":"Increment"
+        };
+        const data = await this.socket!.executeSocketCommand(params);
+        return data;
+    }
+  }
+
+//  const response = await this.execute(`flutter:requestData`, ['performActions:'+actions]) as any;
+//  return response;
 }
