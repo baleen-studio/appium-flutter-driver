@@ -5,7 +5,7 @@
     "appium",
     "flutter"
   ],
-  "version": "2.5.0",
+  "version": "2.5.1.1",
   "author": "TruongSinh Tran-Nguyen <i@truongsinh.pro>",
   "license": "MIT",
   "repository": {
@@ -73,16 +73,18 @@
     "eslint-plugin-promise": "^6.1.1",
     "semantic-release": "^23.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "~5.3"
+    "typescript": "^5.3.5"
   },
   "dependencies": {
-    "appium-ios-device": "^2.4.1",
     "appium-android-driver": "^9.6.0",
-    "appium-uiautomator2-driver": "^3.0.0",
-    "appium-xcuitest-driver": "^6.0.1",
+    "appium-ios-device": "^2.4.1",
+    "appium-uiautomator2-driver": "^3.5.2",
+    "appium-xcuitest-driver": "^7.16.2",
     "bluebird": "^3.1.1",
     "lodash": "^4.0.0",
     "portscanner": "^2.2.0",
+    "read-package-up": "^11.0.0",
+    "rimraf": "^5.0.7",
     "rpc-websockets": "^7.4.16"
   }
 }

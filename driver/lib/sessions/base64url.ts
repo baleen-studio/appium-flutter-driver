@@ -6,7 +6,7 @@ export const decode = (input: string | {ELEMENT: string}): string => {
   if (_.isString(input)) {
     base64String = input;
   } else if (_.has(input, util.W3C_WEB_ELEMENT_IDENTIFIER)) {
-    base64String = input[util.W3C_WEB_ELEMENT_IDENTIFIER];
+    base64String = input[util.W3C_WEB_ELEMENT_IDENTIFIER] as string;
   } else if (_.has(input, 'ELEMENT')) {
     base64String = input.ELEMENT;
   } else {

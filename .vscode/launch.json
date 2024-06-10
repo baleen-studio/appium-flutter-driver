@@ -27,6 +27,22 @@
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ]
+    },
+    {
+      "name": "Debug Renderer Process",
+      "port": 9222,
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "/Users/horimasaaki/VSCodeProjects/appium/appium-inspector/node_modules/.bin/electron",
+      "runtimeArgs": [
+          "/Users/horimasaaki/VSCodeProjects/appium/appium-inspector",
+          "--remote-debugging-port=9222"
+      ],
+      "webRoot": "/Users/horimasaaki/VSCodeProjects/appium/appium-inspector",
+      "timeout": 60000,
+      "presentation": {
+          "hidden": false
+      }
     }
   ]
 }

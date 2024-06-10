@@ -33,6 +33,7 @@ export const performActions = async function(this: FlutterDriver, actions: strin
     actions = JSON.stringify(actions);
   }
 
+  /*
   const json = JSON.parse(actions);
   const performs = json[0];
   const type = performs['type'];
@@ -57,13 +58,17 @@ export const performActions = async function(this: FlutterDriver, actions: strin
         duration = command['duration'];
       case 'pointerUp':
         const params = {
+          //"command":"tap","finderType":"ByValueKey","keyValueString":"textfield","keyValueType":"String"
           "command":"tap","finderType":"ByTooltipMessage","text":"Increment"
         };
+        console.log(params);
         const data = await this.socket!.executeSocketCommand(params);
+        console.log(data);
         return data;
     }
   }
+  */
 
-//  const response = await this.execute(`flutter:requestData`, ['performActions:'+actions]) as any;
-//  return response;
+  const response = await this.execute(`flutter:requestData`, ['performActions:'+actions]) as any;
+  return response;
 }

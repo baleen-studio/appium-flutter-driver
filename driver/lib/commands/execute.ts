@@ -73,6 +73,8 @@ export const execute = async function(
       return await setTextEntryEmulation(this, args[0]);
     case `enterText`:
       return await enterText(this, args[0]);
+    case `checkText`:
+      return await checkText(this, args[0]);
     case `requestData`:
       return await requestData(this, args[0]);
     case `longTap`:
@@ -178,6 +180,9 @@ const getSemanticsId = async (self: FlutterDriver, elementBase64: string) =>
 
 const enterText = async (self: FlutterDriver, text: string) =>
   await self.socket!.executeSocketCommand({ command: `enter_text`, text });
+
+const checkText = async (self: FlutterDriver, text: string) =>
+  await self.socket!.executeSocketCommand({ command: `check_text`, text });
 
 const requestData = async (self: FlutterDriver, message: string) =>
   await self.socket!.executeSocketCommand({ command: `request_data`, message });
