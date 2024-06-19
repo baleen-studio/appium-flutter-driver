@@ -85,6 +85,6 @@
     "portscanner": "^2.2.0",
     "read-package-up": "^11.0.0",
     "rimraf": "^5.0.7",
-    "rpc-websockets": "^7.4.16"
+    "rpc-websockets": "^9.0.1"
   }
 }
