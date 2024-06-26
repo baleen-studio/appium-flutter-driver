@@ -22,3 +22,4 @@ export const setValue = async function(this: FlutterDriver, textInput: string | 
 export const clear = async function(this: FlutterDriver, el: string) {
   await this.setValue([``], el);
 };
+ 

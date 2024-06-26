@@ -237,6 +237,11 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
       const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
       var mess = JSON.parse(response.response.message);
       return mess;
+    } else if (cmd === `setValue`) {
+      logger.debug(`Executing Flutter normal driver command '${cmd}' '${args}'`);
+      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
+      var mess = JSON.parse(response.response.message);
+      return mess;
     } else {
       if (this.driverShouldDoProxyCmd(cmd)) {
         logger.debug(`Executing proxied driver command '${cmd}'`);

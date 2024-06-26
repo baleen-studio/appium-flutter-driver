@@ -1,3 +1,4 @@
+import { runInContext } from 'lodash';
 import type { FlutterDriver } from '../driver';
 import { longTap as longClick} from './execute/scroll';
 
@@ -14,7 +15,7 @@ export const tapEl = async function(
   // perform a tap on the given element
   // if longPress is true, the tap becomes a longPress action
   const commandName = longPress ? `longPress` : `tap`;
-  
+
   return await this.executeElementCommand(commandName, el);
 };
 

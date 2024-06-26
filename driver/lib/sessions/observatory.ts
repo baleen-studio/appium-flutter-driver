@@ -206,8 +206,10 @@ export const executeElementCommand = async function(
   command: string,
   elementBase64?: string,
   extraArgs = {}) {
-  const elementObject = elementBase64 ? JSON.parse(decode(elementBase64)) : {};
-  const serializedCommand = { command, ...elementObject, ...extraArgs };
+
+  //const elementObject = elementBase64 ? JSON.parse(decode(elementBase64)) : {};
+  //const serializedCommand = { command, ...elementObject, ...extraArgs };
+  const serializedCommand = { command, "elementId":elementBase64, ...extraArgs };
   log.debug(`>>> ${JSON.stringify(serializedCommand)}`);
   const data = await this.socket!.executeSocketCommand(serializedCommand);
   log.debug(`<<< ${JSON.stringify(data)} | previous command ${command}`);
