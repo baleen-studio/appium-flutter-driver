@@ -14,6 +14,17 @@ Even though Flutter comes with superb integration test support, [Flutter Driver]
 
 Under the hood, Appium Flutter Driver uses the [Dart VM Service Protocol](https://github.com/dart-lang/sdk/blob/master/runtime/vm/service/service.md) with extension `ext.flutter.driver`, similar to Flutter Driver, to control the Flutter app-under-test (AUT).
 
+## Appium drivers for Flutter
+
+Appium community currently has two drivers for Flutter environment:
+
+- Appium Flutter driver (this driver)
+    - Run Flutter commands over websocekt connection against the observaory URL (calls Flutter APIs directly)
+    - Base APIs are [`flutter_driver`](https://api.flutter.dev/flutter/flutter_driver/flutter_driver-library.html)
+- [`Appium Flutter Integration Driver`](https://github.com/AppiumTestDistribution/appium-flutter-integration-driver)
+    - Run a server on DartVM as part of the application under test in order to call Flutter APIs via the server
+    - Base APIs are [`integration_test`](https://github.com/flutter/flutter/tree/main/packages/integration_test#integration_test)
+
 ## Appium Flutter Driver or Appium UiAutomator2/XCUITest driver
 - Appium Flutter driver manages the application under test and the device under test via Appium UiAutomator2/XCUITest drivers
     -  `FLUTTER` context sends commands to the Dart VM directly over the observatory URL
@@ -65,9 +76,6 @@ This snippet, taken from [example directory](example), is a script written as an
 > So flutter_driver would continue to be maintained for now.
 
 Each client needs [each finder](finder) module to handle [Finders](#Finders). Appium Flutter Driver communicates with the Dart VM directory in the `FLUTTER` context.
-
-> **Note**
-> [Expand deprecation policy to package:flutter_driver](https://github.com/flutter/flutter/issues/139249) potentially means this driver will no longer work by the future Flutter updates. They do not cover all cases that can cover the flutter_driver, such as permission dialog handling, thus we're not sure when the time comes though.
 
 ### Doctor
 Since driver version 2.4.0 you can automate the validation for the most of the above requirements as well as various optional ones needed by driver extensions by running the `appium driver doctor flutter` server command.
@@ -263,14 +271,14 @@ Please replace them properly with your client.
 | [getBottomLeft](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getBottomLeft.html) | :ok: | `driver.execute('flutter:getBottomLeft', buttonFinder)` | Widget |
 | [getBottomRight](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getBottomRight.html) | :ok: | `driver.execute('flutter:getBottomRight', buttonFinder)` | Widget |
 | [getCenter](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getCenter.html) | :ok: | `driver.execute('flutter:getCenter', buttonFinder)` | Widget |
-| [getRenderObjectDiagnostics](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getRenderObjectDiagnostics.html) | :ok: | `driver.execute('flutter:getRenderObjectDiagnostics', counterTextFinder)` | Widget |
+| [getRenderObjectDiagnostics](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getRenderObjectDiagnostics.html) | :ok: | `driver.execute('flutter:getRenderObjectDiagnostics', counterTextFinder, { includeProperties: true, subtreeDepth: 2 })` | Widget |
+| [getWidgetDiagnostics](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getWidgetDiagnostics.html) | :ok: (v2.8.0+) | `driver.execute('flutter:getWidgetDiagnostics', counterTextFinder, { includeProperties: true, subtreeDepth: 2 })` | Widget |
 | [getRenderTree](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getRenderTree.html) | :ok: | `driver.execute('flutter: getRenderTree')` | Session |
 | [getSemanticsId](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getSemanticsId.html) | :ok: | `driver.execute('flutter:getSemanticsId', counterTextFinder)` | Widget |
 | [getText](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getText.html) | :ok: | [`driver.getElementText(counterTextFinder)`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L44) | Widget |
 | [getTopLeft](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getTopLeft.html) | :ok: | `driver.execute('flutter:getTopLeft', buttonFinder)` | Widget |
 | [getTopRight](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getTopRight.html) | :ok: | `driver.execute('flutter:getTopRight', buttonFinder)` | Widget |
 | [getVmFlags](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getVmFlags.html) | :x: |  | Session |
-| [getWidgetDiagnostics](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getWidgetDiagnostics.html) | :x: |  | Widget |
 | [requestData](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/requestData.html) | :ok: | `driver.execute('flutter:requestData', json.dumps({"deepLink": "myapp://item/id1"}))`  | Session |
 | [runUnsynchronized](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/runUnsynchronized.html) | :x: |  | Session |
 | [setFrameSync](https://api.flutter.dev/flutter/flutter_driver/SetFrameSync-class.html) |:ok:| `driver.execute('flutter:setFrameSync', bool , durationMilliseconds)`| Session |
@@ -342,9 +350,10 @@ These Appium commands can work across context
 
 ## Troubleshooting
 
-- input texts https://github.com/appium/appium-flutter-driver/issues/417
+- Input texts https://github.com/appium/appium-flutter-driver/issues/417
 - Looks hanging in `click` https://github.com/appium/appium-flutter-driver/issues/181#issuecomment-1323684510
     - `flutter:setFrameSync` may help
+- `flutter:waitFor` would help to handle "an element does not exist/is not enabled" behavior. [exmaple issue](https://github.com/appium/appium-flutter-driver/issues/693)
 
 ## TODO?
 

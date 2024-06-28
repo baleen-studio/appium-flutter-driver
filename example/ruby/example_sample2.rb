@@ -19,11 +19,11 @@ class ExampleTests < Minitest::Test
       wait_timeout: 20,
       wait_interval: 1
     }
-  }.freeze
+  }
 
   def test_run_example_android
     @core = ::Appium::Core.for(CAPS)
-    @driver = @core.start_driver
+    @driver = @core.start_driver server_url: 'http://localhost:4723'
 
     @driver.context = 'NATIVE_APP'
 

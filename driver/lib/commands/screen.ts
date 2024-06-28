@@ -4,7 +4,7 @@ import { PLATFORM } from '../platform';
 
 export const getScreenshot = async function(this: FlutterDriver) {
   // re-create the port forward
-  var response;
+  let response;
   switch (this.internalCaps.platformName.toLowerCase()) {
     case PLATFORM.IOS:
       //response = await this.execute(`flutter:requestData`, ['screenShot']) as any;
@@ -18,8 +18,8 @@ export const getScreenshot = async function(this: FlutterDriver) {
 
 export const getWindowRect = async function(this: FlutterDriver) {
   const response = await this.execute(`flutter:requestData`, ['getScreenSize']) as any;
-  var mess = JSON.parse(response.response.message);
-  var ret = {'height':mess.height,'width':mess.width,'x':0,'y':0};
+  let mess = JSON.parse(response.response.message);
+  let ret = { 'height':mess.height, 'width':mess.width, 'x':0, 'y':0 };
   return ret;
 };
 
@@ -69,6 +69,6 @@ export const performActions = async function(this: FlutterDriver, actions: strin
   }
   */
 
-  const response = await this.execute(`flutter:requestData`, ['performActions:'+actions]) as any;
+  const response = await this.execute(`flutter:requestData`, ['performActions:' + actions]) as any;
   return response;
 }

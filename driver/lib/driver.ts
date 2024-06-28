@@ -187,16 +187,20 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
   }
 
   public objDump(obj: any, rIndent: string): string {
-    if (!obj) return '';
+    if (!obj) {
+      return '';
+    }
+
+    let result = '', indent = '\t', br = '\n';
   
-    var result = '', indent = '\t', br = '\n';
-  
-    if (rIndent) indent += rIndent;
-  
+    if (rIndent) {
+      indent += rIndent;
+    }
+
     if (typeof obj === 'object' && !obj.tagName) {
       result += '[ Object ] ->' + br;
-  
-      for (var key in obj) {
+
+      for (let key in obj) {
         result += indent + key + ' = ';
         result += typeof obj[key] === 'object' ? this.objDump(obj[key], indent) : obj[key];
         result += br;
@@ -204,7 +208,7 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
     } else {
       result = obj;
     }
-  
+
     return String(result);
   };
 
@@ -223,24 +227,26 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
       return await this.receiveAsyncResponse(...args);
     } else if (cmd === `findElement`) {
       logger.debug(`Executing Flutter driver command '${cmd}' '${args}'`);
-      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
-      var mess = JSON.parse(response.response.message);
+      const response = await this.execute(`flutter:requestData`, [cmd + ':' + args]) as any;
+      let mess = JSON.parse(response.response.message);
       return mess.value;
     } else if (cmd === `click`) {
+      logger.debug(`Executing Flutter normal driver command '${cmd}' '${JSON.stringify(args)}'`);
       /*
-      const data = await this.socket!.executeSocketCommand({ command: `get_layer_tree` });
-      if (!data.isError) {
-        logger.debug(this.objDump(data.response,'\t'));
-      }
+      const params = args[0].split(',');
+      this.click(params[0]);
       */
-      logger.debug(`Executing Flutter normal driver command '${cmd}' '${args}'`);
-      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
-      var mess = JSON.parse(response.response.message);
+      const response = await this.execute(`flutter:requestData`, [cmd + ':' + args]) as any;
+      let mess = JSON.parse(response.response.message);
       return mess;
     } else if (cmd === `setValue`) {
-      logger.debug(`Executing Flutter normal driver command '${cmd}' '${args}'`);
-      const response = await this.execute(`flutter:requestData`, [cmd+':'+args]) as any;
-      var mess = JSON.parse(response.response.message);
+      logger.debug(`Executing Flutter normal driver command '${cmd}' '${JSON.stringify(args)}'`);
+      /*
+      const params = args[0].split(',');
+      this.setValue(params[0], params[1]);
+      */
+      const response = await this.execute(`flutter:requestData`, [cmd + ':' + args]) as any;
+      let mess = JSON.parse(response.response.message);
       return mess;
     } else {
       if (this.driverShouldDoProxyCmd(cmd)) {
