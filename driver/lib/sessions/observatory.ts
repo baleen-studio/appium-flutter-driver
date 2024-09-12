@@ -207,8 +207,58 @@ export const executeElementCommand = async function(
   elementBase64?: string,
   extraArgs = {}) {
 
-  const elementObject = elementBase64 ? JSON.parse(decode(elementBase64)) : {};
-  const serializedCommand = { command, ...elementObject, ...extraArgs };
+  const regexp = new RegExp("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$");
+  let elementObject;
+  let serializedCommand;
+  try {
+    if (regexp.test(elementBase64!)) {
+      elementObject = elementBase64 ? JSON.parse(decode(elementBase64)) : {};
+    } else {
+      elementObject = elementBase64 ? JSON.parse(elementBase64) : {};
+    }
+    if (Array.isArray(elementObject)) {
+      serializedCommand = { command, ...elementObject, ...extraArgs };
+    } else {
+      serializedCommand = { command, 'id':elementObject, ...extraArgs };
+    }
+  } catch (e) {
+    if (regexp.test(elementBase64!)) {
+      serializedCommand = { command, "id": decode(elementBase64!), ...extraArgs };
+    } else {
+      serializedCommand = { command, "id": elementBase64, ...extraArgs };
+    }
+  }
+
+  const response = await this.execute(`flutter:requestData`,  ['getFinderType:' + JSON.stringify(serializedCommand)]);
+  let mess = JSON.parse(response.response.message);
+  serializedCommand['finderType'] = mess['foundBy'].replace('by', 'By');
+  switch(mess['foundBy']) {
+    case 'byType':
+      serializedCommand['type'] = mess['text'];
+      break;
+    case 'byToolTip':
+      serializedCommand['finderType'] = 'ByTooltipMessage';
+      serializedCommand['text'] = mess['text'];
+      break;
+    case 'bySemanticsLabel':
+      serializedCommand['label'] = mess['text'];
+      break;
+    case 'byValueKey':
+      let key = mess['text'];
+      let idx = key.indexOf("[<'");
+      if (idx == 0) {
+        let last = key.indexOf("'>]");
+        if (last > 0) {
+          key = key.substring("[<'".length, last);
+        }
+      }
+      serializedCommand['keyValueString'] = key;
+      serializedCommand['keyValueType'] = 'String';
+      break;
+    default:
+      serializedCommand['text'] = mess['text'];
+  }
+
   log.debug(`>>> ${JSON.stringify(serializedCommand)}`);
   const data = await this.socket!.executeSocketCommand(serializedCommand);
   log.debug(`<<< ${JSON.stringify(data)} | previous command ${command}`);

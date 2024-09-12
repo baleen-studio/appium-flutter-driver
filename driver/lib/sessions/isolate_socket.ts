@@ -1,4 +1,5 @@
 import { Client } from 'rpc-websockets';
+import type { FlutterDriver } from '../driver';
 
 interface ExecuteArgs {
     command: string,
@@ -8,6 +9,7 @@ interface ExecuteArgs {
 export class IsolateSocket extends Client {
     public isolateId: number|string = 0;
     public async executeSocketCommand(args: ExecuteArgs) {
+
         // call an RPC method with parameters
         return this.call(`ext.flutter.driver`, {
             ...args,
