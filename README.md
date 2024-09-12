@@ -26,19 +26,19 @@ Appium community currently has two drivers for Flutter environment:
     - Base APIs are [`integration_test`](https://github.com/flutter/flutter/tree/main/packages/integration_test#integration_test)
 
 ## Appium Flutter Driver or Appium UiAutomator2/XCUITest driver
-- Appium Flutter driver manages the application under test and the device under test via Appium UiAutomator2/XCUITest drivers
-    -  `FLUTTER` context sends commands to the Dart VM directly over the observatory URL
-        - Newer Flutter versions expose its accessibility labels to the system's accessibility features. It means you can find some Flutter elements and can interact with them over `accessibility_id` etc in the vanilla Appium UiAutomator2/XCUITest drivers, although some elements require over the Dart VM
-    - `NATIVE_APP` context is the same as the regular Appium UiAutomator2/XCUITest driver
-        - Please refer to each client's documentation about available commands.
-        - Each driver's documentation also may help.
-          - https://github.com/appium/appium-uiautomator2-driver
-          - https://appium.github.io/appium-xcuitest-driver/latest
+
+As a baseline, we recommend using [official testing tools and strategy](https://docs.flutter.dev/testing/overview) to test Flutter apps as possible in Dart.
+
+If you'd like to test a release app, whcih can be released from app store as-is, Appium [UIAutomator2](https://github.com/appium/appium-uiautomator2-driver)/[XCUITest](https://github.com/appium/appium-xcuitest-driver) driver is a good choice. Since Flutter 3.19, Flutter apps can expose [`identifier` for `SemanticsProperties`](https://api.flutter.dev/flutter/semantics/SemanticsProperties/identifier.html) as `resource-id` in Android and `accessibilityIdentifier` in iOS. They should help to achieve automation against release apps with Appium [UIAutomator2](https://github.com/appium/appium-uiautomator2-driver)/[XCUITest](https://github.com/appium/appium-xcuitest-driver) as blackbox testing.
+
+- Appium Flutter driver has three contexts to manage the application under test and the device under test. To achieve the `FLUTTER` context, the test package requires testing tools to import. The application under test cannot release as-is.
+    - `FLUTTER` context sends commands to the Dart VM directly over the observatory URL. This allows you to interact with Flutter elements directly.
+    - `NATIVE_APP` context is the same as the regular Appium [UIAutomator2](https://github.com/appium/appium-uiautomator2-driver)/[XCUITest](https://github.com/appium/appium-xcuitest-driver) driver
     - `WEBVIEW` context manages the WebView contents over Appium UiAutomator2/XCUITest driver
-- (**Recommended** if possible) Appium UiAutomator2/XCUITest drivers must be sufficient to achieve automation if the application under test had `semanticLabel` properly. Then, the accessibility mechanism in each OS can expose elements for Appium through OS's accessibility features. Then, this driver is not necessary.
+- (**Recommended** if possible) Appium [UIAutomator2](https://github.com/appium/appium-uiautomator2-driver)/[XCUITest](https://github.com/appium/appium-xcuitest-driver) driver directly must be sufficient to achieve automation if the application under test had `semanticLabel` properly. Then, the accessibility mechanism in each OS can expose elements for Appium through OS's accessibility features.
     - For example, [Key](https://api.flutter.dev/flutter/foundation/Key-class.html) does not work in the Appium UiAutomator2/XCUITest drivers, but can work in the Appium Flutter Driver
     - Flutter 3.19 may have [`identifier` for `SemanticsProperties`](https://api.flutter.dev/flutter/semantics/SemanticsProperties/identifier.html) (introduced by https://github.com/flutter/flutter/pull/138331). It sets `resource-id` and `accessibilityIdentifier` for Android and iOS, then UiAutomator2/XCUITest drivers also can handle `Key` without this driver
-        - `"appium:disableIdLocatorAutocompletion": true` would be necessary to make `resource-id` idea work without any package name prefix like Android compose.
+        - `"appium:settings[disableIdLocatorAutocompletion]": true` or configuring `disableIdLocatorAutocompletion` via [Settings API](https://appium.io/docs/en/latest/guides/settings/) would be necessary to make `resource-id` idea work without any package name prefix like Android compose.
         - e.g. https://github.com/flutter/flutter/issues/17988#issuecomment-1867097631
 
 ## Installation
@@ -67,7 +67,7 @@ dev_dependencies:
     sdk: flutter
 ```
 
-This snippet, taken from [example directory](example), is a script written as an appium client with `webdriverio`, and assumes you have `appium` server (with `appium-flutter-driver` installed) running on the same host and default port (`4723`). For more info, see example's [README.md](https://github.com/truongsinh/appium-flutter-driver/tree/main/example/README.md)
+This snippet, taken from [example directory](example), is a script written as an appium client with `webdriverio`, and assumes you have `appium` server (with `appium-flutter-driver` installed) running on the same host and default port (`4723`). For more info, see example's [README.md](https://github.com/appium/appium-flutter-driver/tree/main/example/README.md)
 
 > **Note**
 >
@@ -110,8 +110,8 @@ SKIP_IOS=1 appium driver doctor flutter
 
 | Capability | Description | Example Values |
 | - | - | -|
-| appium:retryBackoffTime | The time wait for socket connection retry to get flutter session (default 3000ms)|500|
-| appium:maxRetryCount    | The count for socket connection retry for get flutter session (default 10)          | 20|
+| appium:retryBackoffTime | The interval to find the observetory url from logs. (default 3000ms)|500|
+| appium:maxRetryCount    | The count to find the observatory url. (default 10)          | 20|
 | appium:observatoryWsUri | The URL to attach to the Dart VM. The Appium Flutter Driver finds the WebSocket URL from the device log by default. You can skip the finding the URL process by specifying this capability. Then, this driver attempt to establish a WebSocket connection against the given WebSocket URL. Note that this capability expects the URL is ready for access by outside an appium session. This flutter driver does not do port-forwarding with this capability. You may need to coordinate the port-forwarding as well. | 'ws://127.0.0.1:60992/aaaaaaaaaaa=/ws' |
 | appium:isolateId | The isolate id to attach to as the initial attempt. A session can change the isolate with `flutter:setIsolateId` command. The default behavior finds `main` isolate id and attaches it. | `isolates/2978358234363215`, `2978358234363215` |
 | appium:skipPortForward | Whether skip port forwarding from the flutter driver local to the device under test with `observatoryWsUri` capability. It helps you to manage the application under test, the observatory URL and the port forwarding configuration. The default is `true`. | true, false |
@@ -205,7 +205,6 @@ You have a couple of methods to start the application under test by establishing
     1. Start a session without `app` capability
     2. Install the application under test via `driver.install_app` or `mobile:installApp` command etc
     3. Calls `flutter:connectObservatoryWsUrl` command to keep finding an observatory URL to the Dart VM
-        - `appium:retryBackoffTime` and `appium:maxRetryCount` will control the duration to keep finding an observatory URL to the Dart VM
     4. (at the same time) Launch the application under test via outside the appium-flutter-driver
         - e.g. Launch an iOS process via [ios-go](https://github.com/danielpaulus/go-ios), [iproxy](https://github.com/libimobiledevice/libusbmuxd#iproxy) or [tidevice](https://github.com/alibaba/taobao-iphone-device)
     5. Once `flutter:connectObservatoryWsUrl` identify the observatory URL, the command will establish a connection to the Dart VM
@@ -249,7 +248,7 @@ Legend:
 | [bySemanticsLabel](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/bySemanticsLabel.html) | :ok: |  |
 | [byTooltip](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/byTooltip.html) | :ok: | `byTooltip('Increment')` |
 | [byType](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/byType.html) | :ok: | `byType('TextField')` |
-| [byValueKey](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/byValueKey.html) | :ok: | [`byValueKey('counter')`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L30) |
+| [byValueKey](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/byValueKey.html) | :ok: | [`byValueKey('counter')`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L30) |
 | [descendant](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/descendant.html) | :ok: |  |
 | [pageBack](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/pageBack.html) | :ok: | `pageBack()` |
 | [text](https://api.flutter.dev/flutter/flutter_driver/CommonFinders/text.html) | :ok: | `byText('foo')` |
@@ -262,7 +261,7 @@ Please replace them properly with your client.
 
 | Flutter API | Status | WebDriver example (JavaScript, webdriverio) | Scope |
 | - | - | - | - |
-| [FlutterDriver.connectedTo](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/FlutterDriver.connectedTo.html) | :ok: | [`wdio.remote(opts)`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L33) | Session |
+| [FlutterDriver.connectedTo](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/FlutterDriver.connectedTo.html) | :ok: | [`wdio.remote(opts)`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L33) | Session |
 | [checkHealth](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/checkHealth.html) | :ok: | `driver.execute('flutter:checkHealth')` | Session |
 | clearTextbox | :ok: | `driver.elementClear(find.byType('TextField'))` | Session |
 | [clearTimeline](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/clearTimeline.html) | :ok: | `driver.execute('flutter:clearTimeline')` | Session |
@@ -275,7 +274,7 @@ Please replace them properly with your client.
 | [getWidgetDiagnostics](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getWidgetDiagnostics.html) | :ok: (v2.8.0+) | `driver.execute('flutter:getWidgetDiagnostics', counterTextFinder, { includeProperties: true, subtreeDepth: 2 })` | Widget |
 | [getRenderTree](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getRenderTree.html) | :ok: | `driver.execute('flutter: getRenderTree')` | Session |
 | [getSemanticsId](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getSemanticsId.html) | :ok: | `driver.execute('flutter:getSemanticsId', counterTextFinder)` | Widget |
-| [getText](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getText.html) | :ok: | [`driver.getElementText(counterTextFinder)`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L44) | Widget |
+| [getText](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getText.html) | :ok: | [`driver.getElementText(counterTextFinder)`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L44) | Widget |
 | [getTopLeft](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getTopLeft.html) | :ok: | `driver.execute('flutter:getTopLeft', buttonFinder)` | Widget |
 | [getTopRight](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getTopRight.html) | :ok: | `driver.execute('flutter:getTopRight', buttonFinder)` | Widget |
 | [getVmFlags](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/getVmFlags.html) | :x: |  | Session |
@@ -292,9 +291,9 @@ Please replace them properly with your client.
 | [setTextEntryEmulation](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/setTextEntryEmulation.html) | :ok: | `driver.execute('flutter:setTextEntryEmulation', false)` | Session |
 | [startTracing](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/startTracing.html) | :x: |  | Session |
 | [stopTracingAndDownloadTimeline](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/stopTracingAndDownloadTimeline.html) | :x: |  | Session |
-| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.elementClick(buttonFinder)`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L46) | Widget |
-| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.touchAction({action: 'tap', element: {elementId: buttonFinder}})`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L47) | Widget |
-| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.execute('flutter:clickElement', buttonFinder, {timeout:5000})`](https://github.com/truongsinh/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L47) | Widget |
+| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.elementClick(buttonFinder)`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L46) | Widget |
+| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.touchAction({action: 'tap', element: {elementId: buttonFinder}})`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L47) | Widget |
+| [tap](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/tap.html) | :ok: | [`driver.execute('flutter:clickElement', buttonFinder, {timeout:5000})`](https://github.com/appium/appium-flutter-driver/blob/5df7386b59bb99008cb4cff262552c7259bb2af2/example/src/index.js#L47) | Widget |
 | [traceAction](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/traceAction.html) | :x: |  | Session |
 | [waitFor](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/waitFor.html) | :ok: | `driver.execute('flutter:waitFor', buttonFinder, 100)` | Widget |
 | [waitForAbsent](https://api.flutter.dev/flutter/flutter_driver/FlutterDriver/waitForAbsent.html) | :ok: | `driver.execute('flutter:waitForAbsent', buttonFinder)` | Widget |
@@ -379,9 +378,8 @@ $ npm publish
 ```
 
 ### Java implementation
-```
-https://github.com/ashwithpoojary98/javaflutterfinder
-```
-```
-https://github.com/5v1988/appium-flutter-client
-```
+
+- https://github.com/appium/appium-flutter-driver/tree/main/finder/kotlin via jitpack
+- https://github.com/ashwithpoojary98/javaflutterfinder
+- https://github.com/5v1988/appium-flutter-client
+

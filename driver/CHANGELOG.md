@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.9.2
+- Fix observatory url finding after an app activation
+    - Bring `appium:maxRetryCount` and `appium:retryBackoffTime` back to use for the observaotry url findings.
+
+## 2.9.0 (2.9.1)
+- Tune syslog scanning to find the observatory url
+    - Drop `appium:maxRetryCount` and `appium:retryBackoffTime` as no usage
+- Update Appium UIAutomation2 driver dependency to 3.7.4
+- Update XCUITest driver dependency to 7.24.1
+
 ## 2.8.0
 - Support `getWidgetDiagnostics`
 
