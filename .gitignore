@@ -54,3 +54,6 @@ finder/python/Appium_Flutter_Finder.egg-info
 .vs/
 bin/
 obj/
+
+.github/workflow
+
