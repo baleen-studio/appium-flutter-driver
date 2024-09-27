@@ -222,6 +222,7 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
   };
 
   public async executeCommand(cmd: string, ...args: [string, [{skipAttachObservatoryUrl: string, any: any}]]) {
+    logger.debug(`Executing command '${cmd}' '${JSON.stringify({...args})}'`);
     if (new RegExp(/^[\s]*mobile:[\s]*activateApp$/).test(args[0])) {
       const { skipAttachObservatoryUrl = false } = args[1][0];
       await this.proxydriver.executeCommand(cmd, ...args);
@@ -251,6 +252,10 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
       let mess = JSON.parse(response.response.message);
       return mess;
      */
+    } else if (cmd === `performActions`) {
+      logger.debug(`Executing Flutter driver command '${cmd}' '${JSON.stringify({...args})}'`);
+      const response = this.performActions(JSON.stringify(args[0]));
+      return response;
     } else {
       if (this.driverShouldDoProxyCmd(cmd)) {
         logger.debug(`Executing proxied driver command '${cmd}'`);
@@ -259,12 +264,12 @@ class FlutterDriver extends BaseDriver<FluttertDriverConstraints> {
         // Only FlutterDriver CommandTimeout is used; Proxy is disabled
         // All proxy commands needs to reset the FlutterDriver CommandTimeout
         // Here we manually reset the FlutterDriver CommandTimeout for commands that goes to proxy.
-        this.clearNewCommandTimeout();
+        //this.clearNewCommandTimeout();
         const result = await this.proxydriver.executeCommand(cmd, ...args);
-        this.startNewCommandTimeout();
+        //this.startNewCommandTimeout();
         return result;
       } else {
-        logger.debug(`Executing Flutter super driver command '${cmd}' '${args}'`);
+        logger.debug(`Executing Flutter super driver command '${cmd}' '${JSON.stringify({...args})}'`);
         return await super.executeCommand(cmd, ...args);
         //return await this.execute(`flutter:${cmd}`, args);
       }
