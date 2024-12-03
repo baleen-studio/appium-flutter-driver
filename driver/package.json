@@ -62,7 +62,7 @@
     "@appium/types": "^0.x",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "eslint": "^8.46.0",
+    "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.28.0",
